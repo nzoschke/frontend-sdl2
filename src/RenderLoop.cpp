@@ -5,6 +5,7 @@
 #include <Poco/Util/Application.h>
 
 #include <SDL2/SDL.h>
+#include <fstream>
 
 RenderLoop::RenderLoop()
     : _audioCapture(Poco::Util::Application::instance().getSubsystem<AudioCapture>())
@@ -274,6 +275,25 @@ void RenderLoop::KeyEvent(const SDL_KeyboardEvent& event)
             projectm_key_handler(_projectMHandle, PROJECTM_KEYDOWN, PROJECTM_K_DOWN, PROJECTM_KMOD_NONE);
             break;
 
+        case SDLK_MINUS:
+            unsigned int index = 0;
+            if (projectm_get_selected_preset_index(_projectMHandle, &index)) {
+                const char* presetName = projectm_get_preset_name(_projectMHandle, index);
+                SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Appending to blocklist preset %d %s\n", index, presetName);
+
+                std::ofstream outfile;
+                outfile.open("blocklist.txt", std::ios_base::app);
+                outfile << presetName;
+                outfile << "\n";
+
+                projectm_set_toast_message(_projectMHandle, presetName); // TODO how to say "Blocked %d %s", index, name
+
+                projectm_remove_preset(_projectMHandle, index);
+                projectm_select_next_preset(_projectMHandle, false);
+
+                projectm_free_string(presetName);
+            }
+            break;
     }
 }
 

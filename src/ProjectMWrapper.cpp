@@ -5,6 +5,7 @@
 #include <Poco/Util/Application.h>
 
 #include <SDL2/SDL_opengl.h>
+#include <fstream>
 
 const char* ProjectMWrapper::name() const
 {
@@ -52,6 +53,16 @@ void ProjectMWrapper::initialize(Poco::Util::Application& app)
         settings.title_font_url = nullptr;
 
         _projectM = projectm_create_settings(&settings, PROJECTM_FLAG_NONE);
+
+        std::ifstream infile("blocklist.txt");
+        std::string line;
+        for( std::string line; getline( infile, line ); )
+        {
+            unsigned int index = projectm_get_preset_index(_projectM, line.c_str());
+            projectm_remove_preset(_projectM, index);
+            SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Removing blocklist preset %d %s\n", index, line.c_str());
+        }
+
 
         if (!_config->getBool("enableSplash", true))
         {
