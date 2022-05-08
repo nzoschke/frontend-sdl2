@@ -105,7 +105,8 @@ void ProjectMWrapper::initialize(Poco::Util::Application& app)
             }
             else
             {
-                projectm_select_next_preset(_projectM, true);
+                projectm_select_preset(_projectM, 0, true);
+                // projectm_select_next_preset(_projectM, true);
             }
         }
     }

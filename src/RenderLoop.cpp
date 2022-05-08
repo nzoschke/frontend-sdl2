@@ -180,6 +180,16 @@ void RenderLoop::KeyEvent(const SDL_KeyboardEvent& event)
 
         case SDLK_n:
             projectm_select_next_preset(_projectMHandle, true);
+
+            {
+                unsigned int index = 0;
+                projectm_get_selected_preset_index(_projectMHandle, &index);
+                unsigned int size = projectm_get_playlist_size(_projectMHandle);
+
+                char buffer [50];
+                sprintf (buffer, "next: %d / %d", index, size);
+                projectm_set_toast_message(_projectMHandle, buffer);
+            }
             break;
 
         case SDLK_p:
@@ -286,7 +296,9 @@ void RenderLoop::KeyEvent(const SDL_KeyboardEvent& event)
                 outfile << presetName;
                 outfile << "\n";
 
-                projectm_set_toast_message(_projectMHandle, presetName); // TODO how to say "Blocked %d %s", index, name
+                char buffer [50];
+                sprintf (buffer, "blocked: %s", presetName);
+                projectm_set_toast_message(_projectMHandle, buffer);
 
                 projectm_remove_preset(_projectMHandle, index);
 
