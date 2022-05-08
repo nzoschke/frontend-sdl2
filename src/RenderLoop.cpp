@@ -181,7 +181,7 @@ void RenderLoop::KeyEvent(const SDL_KeyboardEvent& event)
         case SDLK_n:
             projectm_select_next_preset(_projectMHandle, true);
 
-            {
+            if (_showPreset) {
                 unsigned int index = 0;
                 projectm_get_selected_preset_index(_projectMHandle, &index);
                 unsigned int size = projectm_get_playlist_size(_projectMHandle);
@@ -253,6 +253,7 @@ void RenderLoop::KeyEvent(const SDL_KeyboardEvent& event)
         case SDLK_F3:
             // Show preset name
             projectm_key_handler(_projectMHandle, PROJECTM_KEYDOWN, PROJECTM_K_F3, PROJECTM_KMOD_NONE);
+            _showPreset = !_showPreset;
             break;
 
         case SDLK_F4:
@@ -296,12 +297,14 @@ void RenderLoop::KeyEvent(const SDL_KeyboardEvent& event)
                 outfile << presetName;
                 outfile << "\n";
 
-                char buffer [50];
-                sprintf (buffer, "blocked: %s", presetName);
-                projectm_set_toast_message(_projectMHandle, buffer);
+                {
+                    unsigned int size = projectm_get_playlist_size(_projectMHandle);
+                    char buffer [50];
+                    sprintf (buffer, "next: %d / %d", index, size);
+                    projectm_set_toast_message(_projectMHandle, buffer);
+                }
 
                 projectm_remove_preset(_projectMHandle, index);
-
                 projectm_select_preset(_projectMHandle, index, true);
                 // projectm_select_next_preset(_projectMHandle, false);
 
