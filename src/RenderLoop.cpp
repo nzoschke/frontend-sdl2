@@ -289,7 +289,9 @@ void RenderLoop::KeyEvent(const SDL_KeyboardEvent& event)
                 projectm_set_toast_message(_projectMHandle, presetName); // TODO how to say "Blocked %d %s", index, name
 
                 projectm_remove_preset(_projectMHandle, index);
-                projectm_select_next_preset(_projectMHandle, false);
+
+                projectm_select_preset(_projectMHandle, index, true);
+                // projectm_select_next_preset(_projectMHandle, false);
 
                 projectm_free_string(presetName);
             }
@@ -436,8 +438,6 @@ void RenderLoop::PresetSwitchedEvent(bool isHardCut, unsigned int index, void* c
     auto presetName = projectm_get_preset_name(that->_projectMHandle, index);
     SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Displaying preset: %s\n", presetName);
 
-    std::string newTitle = "projectM ➫ " + std::string(presetName);
     projectm_free_string(presetName);
-
-    that->_sdlRenderingWindow.SetTitle(newTitle);
+    that->_sdlRenderingWindow.SetTitle("projectM");
 }

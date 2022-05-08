@@ -77,6 +77,10 @@ void ProjectMSDLApplication::defineOptions(Poco::Util::OptionSet& options)
                              false, "<path>", true)
                           .binding("projectM.presetPath", _commandLineOverrides));
 
+    options.addOption(Option("presetFilter", "", "Only load presets that contain the filter in their path, e.g. 'Dancer/Aurora'",
+                             false, "<text>", true)
+                          .binding("presetFilter", _commandLineOverrides));
+
     options.addOption(Option("enableSplash", "s", "If true, initially displays the built-in projectM logo preset.",
                              false, "<0/1>", true)
                           .binding("projectM.enableSplash", _commandLineOverrides));
@@ -139,6 +143,7 @@ void ProjectMSDLApplication::defineOptions(Poco::Util::OptionSet& options)
     options.addOption(Option("beatSensitivity", "", "Beat sensitivity. Between 0.0 and 5.0. Default 1.0.",
                              false, "<number>", true)
                           .binding("projectM.beatSensitivity", _commandLineOverrides));
+
 
 }
 
