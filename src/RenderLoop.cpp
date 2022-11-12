@@ -5,6 +5,7 @@
 #include <Poco/Util/Application.h>
 
 #include <SDL2/SDL.h>
+#include <fstream>
 
 RenderLoop::RenderLoop()
     : _audioCapture(Poco::Util::Application::instance().getSubsystem<AudioCapture>())
@@ -179,6 +180,16 @@ void RenderLoop::KeyEvent(const SDL_KeyboardEvent& event)
 
         case SDLK_n:
             projectm_select_next_preset(_projectMHandle, true);
+
+            if (_showPreset) {
+                unsigned int index = 0;
+                projectm_get_selected_preset_index(_projectMHandle, &index);
+                unsigned int size = projectm_get_playlist_size(_projectMHandle);
+
+                char buffer [50];
+                sprintf (buffer, "next: %d / %d", index, size);
+                projectm_set_toast_message(_projectMHandle, buffer);
+            }
             break;
 
         case SDLK_p:
@@ -242,6 +253,7 @@ void RenderLoop::KeyEvent(const SDL_KeyboardEvent& event)
         case SDLK_F3:
             // Show preset name
             projectm_key_handler(_projectMHandle, PROJECTM_KEYDOWN, PROJECTM_K_F3, PROJECTM_KMOD_NONE);
+            _showPreset = !_showPreset;
             break;
 
         case SDLK_F4:
@@ -274,6 +286,31 @@ void RenderLoop::KeyEvent(const SDL_KeyboardEvent& event)
             projectm_key_handler(_projectMHandle, PROJECTM_KEYDOWN, PROJECTM_K_DOWN, PROJECTM_KMOD_NONE);
             break;
 
+        case SDLK_MINUS:
+            unsigned int index = 0;
+            if (projectm_get_selected_preset_index(_projectMHandle, &index)) {
+                const char* presetName = projectm_get_preset_name(_projectMHandle, index);
+                SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Appending to blocklist preset %d %s\n", index, presetName);
+
+                std::ofstream outfile;
+                outfile.open("blocklist.txt", std::ios_base::app);
+                outfile << presetName;
+                outfile << "\n";
+
+                {
+                    unsigned int size = projectm_get_playlist_size(_projectMHandle);
+                    char buffer [50];
+                    sprintf (buffer, "next: %d / %d", index, size);
+                    projectm_set_toast_message(_projectMHandle, buffer);
+                }
+
+                projectm_remove_preset(_projectMHandle, index);
+                projectm_select_preset(_projectMHandle, index, true);
+                // projectm_select_next_preset(_projectMHandle, false);
+
+                projectm_free_string(presetName);
+            }
+            break;
     }
 }
 
@@ -416,8 +453,6 @@ void RenderLoop::PresetSwitchedEvent(bool isHardCut, unsigned int index, void* c
     auto presetName = projectm_get_preset_name(that->_projectMHandle, index);
     SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Displaying preset: %s\n", presetName);
 
-    std::string newTitle = "projectM ➫ " + std::string(presetName);
     projectm_free_string(presetName);
-
-    that->_sdlRenderingWindow.SetTitle(newTitle);
+    that->_sdlRenderingWindow.SetTitle("projectM");
 }

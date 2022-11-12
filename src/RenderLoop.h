@@ -67,6 +67,8 @@ protected:
 
     bool _mouseDown{ false }; //!< Left mouse button is pressed
 
+    bool _showPreset{ false };
+
     int _renderWidth{ 0 };
     int _renderHeight{ 0 };
 
