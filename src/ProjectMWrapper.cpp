@@ -39,10 +39,10 @@ void ProjectMWrapper::initialize(Poco::Util::Application& app)
         settings.aspect_correction = _config->getBool("aspectCorrectionEnabled", true);
 
         // Preset display settings
-        settings.preset_duration = _config->getInt("displayDuration", 40);
+        settings.preset_duration = _config->getInt("displayDuration", 60);
         settings.soft_cut_duration = _config->getInt("transitionDuration", 0);
         settings.hard_cut_enabled = _config->getBool("hardCutsEnabled", true);
-        settings.hard_cut_duration = _config->getInt("hardCutDuration", 20);
+        settings.hard_cut_duration = _config->getInt("hardCutDuration", 50);
         settings.hard_cut_sensitivity = static_cast<float>(_config->getDouble("hardCutSensitivity", 1.0));
         settings.beat_sensitivity = static_cast<float>(_config->getDouble("beatSensitivity", 1.0));
         settings.shuffle_enabled = _config->getBool("shuffleEnabled", true);
